@@ -15,4 +15,3 @@ class CottononItem(Item):
     currency = Field()
     image_urls = Field()
     skus = Field()
-    out_of_stock = Field()
