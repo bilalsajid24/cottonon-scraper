@@ -1,7 +1,6 @@
 import datetime
 import json
 
-from scrapy.link import Link
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule, Spider, Request
 from w3lib.url import url_query_cleaner, add_or_replace_parameters
@@ -55,6 +54,7 @@ class CottononSGParser(Mixin, Spider):
         product['description'] = self.get_product_description(response)
         product['gender'] = self.get_product_gender(response)
         product['image_urls'] = self.get_product_images(response)
+        product['brand'] = self.get_product_brand(raw_product)
 
         product['meta'] = self.size_requests(response, raw_product)
 
@@ -171,10 +171,7 @@ class CottononSGCrawler(Mixin, CrawlSpider):
 
     product_css = ['.thumb-link']
 
-    def process_links(self, links):
-        return [Link(url=url_query_cleaner(link.url)) for link in links]
-
     rules = (
         Rule(LinkExtractor(restrict_css=listings_css, deny=deny_re), callback='_parse'),
-        Rule(LinkExtractor(restrict_css=product_css), callback=parser.parse, process_links='process_links'),
+        Rule(LinkExtractor(restrict_css=product_css), callback=parser.parse),
     )

@@ -3,14 +3,15 @@ import re
 from .utils import GENDER_MAP, Gender
 
 
+def remove_spaces_and_strip(value):
+    return re.sub(r'\s+', ' ', value.replace('\xa0', ' ')).strip()
+
+
 def clean(lst_or_str):
-    def sanitize(input_val):
-        return re.sub(r'\s+', ' ', input_val.replace('\xa0', ' ')).strip()
+    if isinstance(lst_or_str, list):
+        return [x for x in (remove_spaces_and_strip(y) for y in lst_or_str if y is not None) if x]
 
-    if not isinstance(lst_or_str, str) and getattr(lst_or_str, '__iter__', False):
-        return [x for x in (sanitize(y) for y in lst_or_str if y is not None) if x]
-
-    return sanitize(lst_or_str)
+    return remove_spaces_and_strip(lst_or_str)
 
 
 def detect_gender(str_or_lst):
@@ -26,4 +27,5 @@ def detect_gender(str_or_lst):
         if gender.value in detected_genders:
             return gender.value
 
+    # Return default gender value
     return Gender.ADULTS.value
