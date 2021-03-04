@@ -23,6 +23,7 @@ def detect_gender(str_or_lst):
         if key in str_or_lst.lower():
             detected_genders.append(gender)
 
+    # Looping through genders (Enum) for returning on the basis of order
     for gender in Gender:
         if gender.value in detected_genders:
             return gender.value

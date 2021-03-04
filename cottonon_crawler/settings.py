@@ -1,3 +1,5 @@
+import os
+
 BOT_NAME = 'cottonon_crawler'
 
 SPIDER_MODULES = ['cottonon_crawler.spiders']
@@ -7,7 +9,7 @@ DOWNLOAD_DELAY = 0
 
 ROBOTSTXT_OBEY = False
 COOKIES_DEBUG = False
-LOG_LEVEL = 'DEBUG'
+LOG_LEVEL = os.environ['LOG_LEVEL']
 
 RETRY_HTTP_CODES = [
     '500', '503', '502', '504', '400',

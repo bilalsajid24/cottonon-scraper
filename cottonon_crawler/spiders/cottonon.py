@@ -14,8 +14,12 @@ class Mixin:
     retailer = 'cottonon'
     allowed_domains = ['cottonon.com']
 
-    default_brand = 'Cotton On'
     seen_ids = set()
+
+    default_brand = 'Cotton On'
+    default_currency = ('$', 'SGD')
+
+    one_sizes_strings = ['SOLID', 'OS']
 
     def return_unique_garment(self, product_id):
         if product_id in self.seen_ids:
@@ -26,6 +30,9 @@ class Mixin:
 
 
 class CottononSGParser(Mixin, Spider):
+    """
+    Parsing logic for a single product (Retrieving all the metadata)
+    """
     name = Mixin.retailer + '-parser'
 
     variation_url = 'https://cottonon.com/SG/show-variation/'
@@ -55,6 +62,7 @@ class CottononSGParser(Mixin, Spider):
         product['gender'] = self.get_product_gender(response)
         product['image_urls'] = self.get_product_images(response)
         product['brand'] = self.get_product_brand(raw_product)
+        product['currency'] = self.default_currency
 
         product['meta'] = self.size_requests(response, raw_product)
 
@@ -132,7 +140,7 @@ class CottononSGParser(Mixin, Spider):
         sku['color'] = color[0] if color else None
         sku['size'] = response.css(size_css).get()
 
-        if sku['size'] == 'OS':
+        if sku['size'] in self.one_sizes_strings:
             sku['size'] = 'One Size'
 
         return sku
@@ -148,6 +156,10 @@ class CottononSGParser(Mixin, Spider):
 
 
 class CottononSGCrawler(Mixin, CrawlSpider):
+    """
+    Crawling logic for finding and hitting all the category URLs and passing over
+    the control to the Parser if the parser if the product page is found
+    """
     name = Mixin.retailer + '-crawler'
     start_urls = ['https://cottonon.com/SG/']
     parser = CottononSGParser()
