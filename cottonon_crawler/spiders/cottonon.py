@@ -4,7 +4,7 @@ import json
 from scrapy.spiders import CrawlSpider, Spider, Request
 from w3lib.url import url_query_cleaner, add_or_replace_parameters
 
-from ..helpers import clean, detect_gender, make_rules
+from ..helpers import clean, detect_gender, make_rules, open_category_file
 from ..items import CottononItem
 
 
@@ -163,11 +163,16 @@ class CottononSGCrawler(Mixin, CrawlSpider):
     start_urls = ['https://cottonon.com/SG/']
     parser = CottononSGParser()
 
-    def __init__(self, menu_items=False):
+    def __init__(self, menu_items=False, read_from_file=False):
         super().__init__()
         self.get_menu_items = bool(menu_items)
+        self.read_from_file = bool(read_from_file)
         self.menu_items = []
         self._rules = make_rules(self)
+
+        if self.read_from_file:
+            reader = open_category_file()
+            self.start_urls = [row['Url'] for row in reader]
 
     def process_links(self, links):
         if not self.get_menu_items or not links:
@@ -175,6 +180,7 @@ class CottononSGCrawler(Mixin, CrawlSpider):
 
         menu_links = [item['Url'] for item in self.menu_items]
 
+        # Store unique categories to the file
         for link in links:
             category_text = clean(link.text)
             category_url = clean(link.url)

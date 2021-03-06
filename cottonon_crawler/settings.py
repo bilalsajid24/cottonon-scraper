@@ -5,7 +5,9 @@ BOT_NAME = 'cottonon_crawler'
 SPIDER_MODULES = ['cottonon_crawler.spiders']
 NEWSPIDER_MODULE = 'cottonon_crawler.spiders'
 
-DOWNLOAD_DELAY = 0
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 ' \
+             '(KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36'
+DOWNLOAD_DELAY = 1
 
 ROBOTSTXT_OBEY = False
 COOKIES_DEBUG = False
