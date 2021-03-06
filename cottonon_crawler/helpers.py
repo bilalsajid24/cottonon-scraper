@@ -1,5 +1,8 @@
 import re
 
+from scrapy.linkextractors import LinkExtractor
+from scrapy.spiders import Rule
+
 from .utils import GENDER_MAP, Gender
 
 
@@ -30,3 +33,33 @@ def detect_gender(str_or_lst):
 
     # Return default gender value
     return Gender.ADULTS.value
+
+
+def make_rules(crawler):
+    deny_re = [
+        '/stationery/',
+        '/stationery-homewares/',
+        '/collab-shop/',
+        '/tech-accessories/',
+        '/sale-tech/',
+        '/sale-gifting/',
+        '/sale-stationery-living/',
+        '/gifts/',
+        '-gifts',
+    ]
+
+    listings_css = ['.top-level-container .menu-item']
+    pagination_css = ['.page-next']
+    product_css = ['.thumb-link']
+
+    rules = [
+        Rule(LinkExtractor(restrict_css=listings_css, deny=deny_re), process_links=crawler.process_links),
+    ]
+
+    if not crawler.get_menu_items:
+        rules += [
+            Rule(LinkExtractor(restrict_css=pagination_css, deny=deny_re)),
+            Rule(LinkExtractor(restrict_css=product_css), callback=crawler.parser.parse),
+        ]
+
+    return rules

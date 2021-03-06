@@ -1,11 +1,10 @@
 import datetime
 import json
 
-from scrapy.linkextractors import LinkExtractor
-from scrapy.spiders import CrawlSpider, Rule, Spider, Request
+from scrapy.spiders import CrawlSpider, Spider, Request
 from w3lib.url import url_query_cleaner, add_or_replace_parameters
 
-from ..helpers import clean, detect_gender
+from ..helpers import clean, detect_gender, make_rules
 from ..items import CottononItem
 
 
@@ -164,26 +163,25 @@ class CottononSGCrawler(Mixin, CrawlSpider):
     start_urls = ['https://cottonon.com/SG/']
     parser = CottononSGParser()
 
-    deny_re = [
-        '/stationery/',
-        '/stationery-homewares/',
-        '/collab-shop/',
-        '/tech-accessories/',
-        '/sale-tech/',
-        '/sale-gifting/',
-        '/sale-stationery-living/',
-        '/gifts/',
-        '-gifts',
-    ]
+    def __init__(self, menu_items=False):
+        super().__init__()
+        self.get_menu_items = bool(menu_items)
+        self.menu_items = []
+        self._rules = make_rules(self)
 
-    listings_css = [
-        '.top-level-container .menu-item',
-        '.page-next'
-    ]
+    def process_links(self, links):
+        if not self.get_menu_items or not links:
+            return links
 
-    product_css = ['.thumb-link']
+        menu_links = [item['Url'] for item in self.menu_items]
 
-    rules = (
-        Rule(LinkExtractor(restrict_css=listings_css, deny=deny_re), callback='_parse'),
-        Rule(LinkExtractor(restrict_css=product_css), callback=parser.parse),
-    )
+        for link in links:
+            category_text = clean(link.text)
+            category_url = clean(link.url)
+
+            if category_url in menu_links:
+                continue
+
+            self.menu_items.append({'Category': category_text, 'Url': category_url})
+
+        return links
