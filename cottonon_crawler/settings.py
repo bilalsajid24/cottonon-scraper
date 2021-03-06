@@ -11,7 +11,7 @@ DOWNLOAD_DELAY = 1
 
 ROBOTSTXT_OBEY = False
 COOKIES_DEBUG = False
-LOG_LEVEL = os.environ['LOG_LEVEL']
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')
 
 RETRY_HTTP_CODES = [
     '500', '503', '502', '504', '400',

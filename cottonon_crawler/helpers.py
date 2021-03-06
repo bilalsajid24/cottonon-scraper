@@ -69,7 +69,7 @@ def make_rules(crawler):
     if not crawler.get_menu_items or crawler.read_from_file:
         rules += [
             Rule(LinkExtractor(restrict_css=pagination_css, deny=deny_re)),
-            # Rule(LinkExtractor(restrict_css=product_css), callback=crawler.parser.parse),
+            Rule(LinkExtractor(restrict_css=product_css), callback=crawler.parser.parse),
         ]
 
     return rules

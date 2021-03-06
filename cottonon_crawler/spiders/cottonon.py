@@ -170,6 +170,7 @@ class CottononSGCrawler(Mixin, CrawlSpider):
         self.menu_items = []
         self._rules = make_rules(self)
 
+        # Read URLs from file and include them in start_urls
         if self.read_from_file:
             reader = open_category_file()
             self.start_urls = [row['Url'] for row in reader]
